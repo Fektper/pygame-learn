@@ -30,7 +30,8 @@ def get_max_fit_fontsize(text, area, max_font_size = None):
         return bot
 
 class PrerenderedButton:
-    def __init__(self, text: str, area_rect: pygame.Rect, text_color: pygame.Color, background_color: pygame.Color, max_font_size: int = 30):
+    def __init__(self, text: str, area_rect: pygame.Rect, text_color: pygame.Color, background_color: pygame.Color, 
+                 max_font_size: int = 30, pixel_grow_amout: int = 10):
         self.text = text
         self.text_color = text_color
         self.max_font_size = max_font_size
@@ -49,15 +50,36 @@ class PrerenderedButton:
 
         self.callback: Union[None, Callable] = None
 
+        self.hover_end_time: float = 0.1
+        self.hover_time: float = 0
+        self.grow_x: int = int(pixel_grow_amout * area_rect.w / max(area_rect.w, area_rect.h))
+        self.grow_y: int = int(pixel_grow_amout * area_rect.h / max(area_rect.w, area_rect.h))
+
     def render_on(self, screen: pygame.Surface):
-        pygame.draw.rect(screen, self.background_color,self.area_rect)
+        dx = int(self.grow_x * (self.hover_time / self.hover_end_time))
+        dy = int(self.grow_y * (self.hover_time / self.hover_end_time))
+        new_rct = self.area_rect.copy()
+        new_rct.h += dy
+        new_rct.w += dx
+        of_x = -int(dx / 2)
+        of_y = -int(dy / 2)
+        pygame.draw.rect(screen, self.background_color, new_rct.move(of_x, of_y))
+        # pygame.draw.rect(screen, self.background_color,self.area_rect)
 
         screen.blit(self.text_rendered, self.text_pos)
 
     def bind_func(self, func: Callable):
         self.callback = func
 
-    def trigger_if_clicked(self, pos):
-        x, y = pos[0], pos[1]
-        if self.area_rect.collidepoint(x, y) and not self.callback is None:
+    def update(self, mouse_pos, mouse_clicked: bool, dt: float):
+        mouse_over = self.area_rect.collidepoint(*mouse_pos)
+
+        if mouse_clicked and mouse_over and not self.callback is None:
             self.callback()
+
+        if mouse_over:
+            self.hover_time += dt
+            self.hover_time = min(self.hover_end_time, self.hover_time)
+        else:
+            self.hover_time = 0
+        
