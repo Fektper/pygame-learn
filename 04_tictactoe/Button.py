@@ -65,7 +65,7 @@ class PrerenderedButton:
         of_y = -int(dy / 2)
         pygame.draw.rect(screen, self.background_color, new_rct.move(of_x, of_y))
         # pygame.draw.rect(screen, self.background_color,self.area_rect)
-
+        # pygame.draw.rect(screen, "black", self.text_rendered.get_rect().move(self.text_pos.x, self.text_pos.y))
         screen.blit(self.text_rendered, self.text_pos)
 
     def bind_func(self, func: Callable):

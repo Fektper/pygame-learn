@@ -18,6 +18,19 @@ class Scene(ABC):
         pass
 
 
+class GameScene(Scene):
+    def __init__(self):
+        pass
+    
+    def update(self, events, dt):
+        pass
+
+    def render(self, screen):
+        pass
+
+    def bind_scene_switch(self, func):
+        pass
+
 class MenuScene(Scene):
     def __init__(self, width, height):
         self.width = width
@@ -51,4 +64,6 @@ class MenuScene(Scene):
         self.quit_button.render_on(screen)
 
     def bind_scene_switch(self, func):
-        self.scene_switch_func = func
+        game_scene = GameScene()
+        swap_scene_func = lambda: func(game_scene)
+        self.play_game_button.bind_func(swap_scene_func)

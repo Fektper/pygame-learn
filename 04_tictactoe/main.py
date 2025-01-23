@@ -5,7 +5,7 @@ SCREEN_HEIGHT = 720
 
 
 pygame.init()
-pygame.display.set_caption("TicTacGo!")
+pygame.display.set_caption("TicTacToe")
 logo = pygame.image.load("logo/logo64.png")
 pygame.display.set_icon(logo)
 
@@ -18,8 +18,24 @@ dt = 0
 running = True
 
 activeScene = MenuScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+swapActiveScene = False
+candidateScene = None
+
+def push_active_scene_change(new_scene):
+    global swapActiveScene
+    global candidateScene
+    candidateScene = new_scene
+    swapActiveScene = True
+    return
+
+activeScene.bind_scene_switch(push_active_scene_change)
 
 while running:
+    if swapActiveScene:
+        activeScene = candidateScene
+        candidateScene = None
+        swapActiveScene = False
+
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
